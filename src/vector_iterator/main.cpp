@@ -21,4 +21,6 @@ int main()
     // "8 7 6 5 4 3 2 1"
     for (const auto& n : vec)
         fmt::print("{} ", n);
+
+    fmt::print("\n");
 }
