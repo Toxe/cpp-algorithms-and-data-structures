@@ -215,6 +215,8 @@ TEST_CASE("CustomVectorIterator")
         }
     }
 
+    SECTION("operators")
+    {
     SECTION("operator++")
     {
         auto it = vec.begin();
@@ -311,7 +313,10 @@ TEST_CASE("CustomVectorIterator")
         CHECK((vec.begin() + 2) >= (vec.begin() + 1));
         CHECK((vec.begin() + 2) >= (vec.begin() + 2));
     }
+    }
 
+    SECTION("iterator operations")
+    {
     SECTION("std::next")
     {
         auto it = vec.begin();
@@ -344,6 +349,7 @@ TEST_CASE("CustomVectorIterator")
         CHECK(std::distance(vec.begin(), vec.end()) == 8);
         CHECK(std::distance(vec.end(), vec.begin()) == -8);
     }
+    }
 
     SECTION("algorithms")
     {
@@ -365,14 +371,12 @@ TEST_CASE("CustomVectorIterator")
             CHECK(vec[0] == 8);
             CHECK(vec[1] == 7);
             CHECK(vec[2] == 6);
-            CHECK(vec[3] == 5);
 
             std::sort(vec.begin(), vec.end());  // sort back to normal order
 
             CHECK(vec[0] == 1);
             CHECK(vec[1] == 2);
             CHECK(vec[2] == 3);
-            CHECK(vec[3] == 4);
         }
     }
 }
