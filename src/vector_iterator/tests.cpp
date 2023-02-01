@@ -2,8 +2,15 @@
 #include <numeric>
 
 #include "catch2/catch_test_macros.hpp"
+#include "fmt/core.h"
+#include "fmt/format.h"
 
 #include "custom_vector.hpp"
+
+std::ostream& operator<<(std::ostream& os, const CustomVector<int>::CustomVectorIterator& iter)
+{
+    return os << fmt::format("{} ({})", fmt::ptr(std::addressof(iter)), *iter);
+}
 
 TEST_CASE("CustomVector")
 {
@@ -271,10 +278,38 @@ TEST_CASE("CustomVectorIterator")
         CHECK((vec.begin() + 1) < (vec.begin() + 2));
     }
 
+    SECTION("operator==")
+    {
+        CHECK(vec.begin() == vec.begin());
+        CHECK((vec.begin() + 1) == (vec.begin() + 1));
+    }
+
+    SECTION("operator!=")
+    {
+        CHECK(vec.begin() != vec.end());
+        CHECK(vec.begin() != (vec.begin() + 1));
+    }
+
     SECTION("operator<=")
     {
         CHECK(vec.begin() <= vec.begin());
+        CHECK(vec.begin() <= vec.end());
+        CHECK((vec.begin() + 1) <= (vec.begin() + 2));
         CHECK((vec.begin() + 2) <= (vec.begin() + 2));
+    }
+
+    SECTION("operator>")
+    {
+        CHECK(vec.end() > vec.begin());
+        CHECK((vec.begin() + 2) > (vec.begin() + 1));
+    }
+
+    SECTION("operator>=")
+    {
+        CHECK(vec.begin() >= vec.begin());
+        CHECK(vec.end() >= vec.begin());
+        CHECK((vec.begin() + 2) >= (vec.begin() + 1));
+        CHECK((vec.begin() + 2) >= (vec.begin() + 2));
     }
 
     SECTION("std::next")

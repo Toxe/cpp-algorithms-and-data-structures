@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <iterator>
 #include <numeric>
 #include <vector>
@@ -17,6 +18,8 @@ public:
 
         CustomVectorIterator(pointer ptr) : ptr_{ptr} { }
 
+        reference operator*() const { return *ptr_; }
+
         CustomVectorIterator& operator++()
         {
             ++ptr_;
@@ -25,8 +28,8 @@ public:
 
         CustomVectorIterator operator++(int)
         {
-            const CustomVectorIterator tmp = *this;
-            ++ptr_;
+            const CustomVectorIterator tmp{*this};
+            ++(*this);
             return tmp;
         }
 
@@ -38,8 +41,8 @@ public:
 
         CustomVectorIterator operator--(int)
         {
-            const CustomVectorIterator tmp = *this;
-            --ptr_;
+            const CustomVectorIterator tmp{*this};
+            --(*this);
             return tmp;
         }
 
@@ -55,19 +58,13 @@ public:
             return *this;
         }
 
-        reference operator*() const { return *ptr_; }
-        reference operator[](const difference_type n) const { return *(ptr_ + n); }
-
+        CustomVectorIterator operator+(const difference_type n) { return CustomVectorIterator{ptr_ + n}; }
+        CustomVectorIterator operator-(const difference_type n) { return CustomVectorIterator{ptr_ - n}; }
         friend CustomVectorIterator operator+(const difference_type n, const CustomVectorIterator& a) { return CustomVectorIterator{a.ptr_ + n}; }
-        friend CustomVectorIterator operator+(const CustomVectorIterator& a, const difference_type n) { return CustomVectorIterator{a.ptr_ + n}; }
-        friend CustomVectorIterator operator-(const CustomVectorIterator& a, const difference_type n) { return CustomVectorIterator{a.ptr_ - n}; }
 
-        friend bool operator==(const CustomVectorIterator& a, const CustomVectorIterator& b) { return a.ptr_ == b.ptr_; };
-        friend bool operator!=(const CustomVectorIterator& a, const CustomVectorIterator& b) { return a.ptr_ != b.ptr_; };
-        friend bool operator<(const CustomVectorIterator& a, const CustomVectorIterator& b) { return a.ptr_ < b.ptr_; }
-        friend bool operator>(const CustomVectorIterator& a, const CustomVectorIterator& b) { return a.ptr_ > b.ptr_; }
-        friend bool operator<=(const CustomVectorIterator& a, const CustomVectorIterator& b) { return a.ptr_ <= b.ptr_; }
-        friend bool operator>=(const CustomVectorIterator& a, const CustomVectorIterator& b) { return a.ptr_ >= b.ptr_; }
+        auto operator<=>(const CustomVectorIterator& other) const = default;
+
+        reference operator[](const difference_type n) const { return *(ptr_ + n); }
 
         // distance between elements
         friend auto operator-(const CustomVectorIterator& a, const CustomVectorIterator& b) { return a.ptr_ - b.ptr_; };
