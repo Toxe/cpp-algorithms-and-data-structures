@@ -16,7 +16,8 @@ public:
         using pointer = value_type*;
         using reference = value_type&;
 
-        CustomVectorIterator(pointer ptr) : ptr_{ptr} { }
+        constexpr CustomVectorIterator() : ptr_{} { }
+        constexpr explicit CustomVectorIterator(pointer ptr) : ptr_{ptr} { }
 
         reference operator*() const { return *ptr_; }
 
@@ -58,8 +59,8 @@ public:
             return *this;
         }
 
-        CustomVectorIterator operator+(const difference_type n) { return CustomVectorIterator{ptr_ + n}; }
-        CustomVectorIterator operator-(const difference_type n) { return CustomVectorIterator{ptr_ - n}; }
+        CustomVectorIterator operator+(const difference_type n) const { return CustomVectorIterator{ptr_ + n}; }
+        CustomVectorIterator operator-(const difference_type n) const { return CustomVectorIterator{ptr_ - n}; }
         friend CustomVectorIterator operator+(const difference_type n, const CustomVectorIterator& a) { return CustomVectorIterator{a.ptr_ + n}; }
 
         auto operator<=>(const CustomVectorIterator& other) const = default;
@@ -76,6 +77,8 @@ public:
     using reference = T&;
     using const_reference = const T&;
     using size_type = std::size_t;
+    using iterator = CustomVectorIterator;
+    using reverse_iterator = std::reverse_iterator<CustomVectorIterator>;
 
     CustomVector(const size_type count = 0)
         : vector_(count)
@@ -88,8 +91,11 @@ public:
     reference operator[](const size_type pos) { return vector_[pos]; }
     const_reference operator[](const size_type pos) const { return vector_[pos]; }
 
-    CustomVectorIterator begin() { return CustomVectorIterator{vector_.data()}; }
-    CustomVectorIterator end() { return CustomVectorIterator{vector_.data() + vector_.size()}; }
+    iterator begin() { return iterator{vector_.data()}; }
+    iterator end() { return iterator{vector_.data() + vector_.size()}; }
+
+    reverse_iterator rbegin() { return reverse_iterator{end()}; }
+    reverse_iterator rend() { return reverse_iterator{begin()}; }
 
 private:
     std::vector<T> vector_;
