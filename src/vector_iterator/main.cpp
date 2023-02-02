@@ -15,6 +15,18 @@ int main()
 
     fmt::print("\n");
 
+    // "1 2 3 4 5 6 7 8"
+    for (auto it = vec.cbegin(); it != vec.cend(); ++it)
+        fmt::print("{} ", *it);
+
+    fmt::print("\n");
+
+    // "8 7 6 5 4 3 2 1"
+    for (auto it = vec.crbegin(); it != vec.crend(); ++it)
+        fmt::print("{} ", *it);
+
+    fmt::print("\n");
+
     // sort in reverse order
     std::sort(vec.begin(), vec.end(), std::greater{});
 

@@ -41,11 +41,74 @@ TEST_CASE("CustomVector")
         for (std::size_t i = 0; i < vec.size(); ++i)
             CHECK(vec[i] == static_cast<int>(i + 1));
     }
+
+    SECTION("iterators")
+    {
+        SECTION("const")
+        {
+            const CustomVector<int> vec{8};
+
+            SECTION("begin")
+            {
+                auto it1 = vec.begin();
+                auto it2 = vec.cbegin();
+                auto it3 = vec.rbegin();
+                auto it4 = vec.crbegin();
+
+                CHECK(it1 == it2);
+                CHECK(it3 == it4);
+                CHECK(*it1 == *it2);
+                CHECK(*it3 == *it4);
+            }
+
+            SECTION("end")
+            {
+                auto it1 = vec.end();
+                auto it2 = vec.cend();
+                auto it3 = vec.rend();
+                auto it4 = vec.crend();
+
+                CHECK(it1 == it2);
+                CHECK(it3 == it4);
+                CHECK(*(it1 - 1) == *(it2 - 1));
+                CHECK(*(it3 - 1) == *(it4 - 1));
+            }
+        }
+
+        SECTION("non-const")
+        {
+            CustomVector<int> vec{8};
+
+            SECTION("begin")
+            {
+                auto it1 = vec.begin();
+                auto it2 = vec.rbegin();
+
+                *it1 = 100;
+                *it2 = 200;
+
+                CHECK(vec[0] == 100);
+                CHECK(vec[vec.size() - 1] == 200);
+            }
+
+            SECTION("end")
+            {
+                auto it1 = vec.end();
+                auto it2 = vec.rend();
+
+                *(it1 - 1) = 100;
+                *(it2 - 1) = 200;
+
+                CHECK(vec[0] == 200);
+                CHECK(vec[vec.size() - 1] == 100);
+            }
+        }
+    }
 }
 
 TEST_CASE("CustomVector::iterator")
 {
-    CustomVector<int> vec{8};
+    const CustomVector<int> vec{8};
 
     SECTION("iterate values")
     {
@@ -161,8 +224,8 @@ TEST_CASE("CustomVector::iterator")
         // for any two positive integers x and y, if a + (x + y) is valid, then a + (x + y) is equal to (a + x) + y
         {
             auto a = iter1;
-            const int x = 3;
-            const int y = 7;
+            const int x = 2;
+            const int y = 3;
             CHECK((a + (x + y)) == ((a + x) + y));
         }
 
@@ -267,18 +330,6 @@ TEST_CASE("CustomVector::iterator")
             CHECK(*(vec.end() - 3) == 6);
         }
 
-        SECTION("operator[]")
-        {
-            auto it = vec.begin();
-
-            CHECK(*it == 1);
-            CHECK(*(it + 1) == 2);
-            CHECK(*(it + 2) == 3);
-            CHECK(it[0] == 1);
-            CHECK(it[1] == 2);
-            CHECK(it[2] == 3);
-        }
-
         SECTION("operator<")
         {
             CHECK(vec.begin() < vec.end());
@@ -317,6 +368,32 @@ TEST_CASE("CustomVector::iterator")
             CHECK(vec.end() >= vec.begin());
             CHECK((vec.begin() + 2) >= (vec.begin() + 1));
             CHECK((vec.begin() + 2) >= (vec.begin() + 2));
+        }
+
+        SECTION("operator[]")
+        {
+            SECTION("const")
+            {
+                auto it = vec.begin();
+
+                CHECK(*it == 1);
+                CHECK(*(it + 1) == 2);
+                CHECK(*(it + 2) == 3);
+                CHECK(it[0] == 1);
+                CHECK(it[1] == 2);
+                CHECK(it[2] == 3);
+            }
+
+            SECTION("non-const")
+            {
+                CustomVector<int> numbers{8};
+
+                numbers[0] = 100;
+                numbers[numbers.size() - 1] = 200;
+
+                CHECK(*numbers.begin() == 100);
+                CHECK(*(numbers.end() - 1) == 200);
+            }
         }
     }
 
@@ -379,24 +456,26 @@ TEST_CASE("CustomVector::iterator")
 
         SECTION("std::sort")
         {
-            std::sort(vec.begin(), vec.end(), std::greater{});  // sort in reverse order
+            CustomVector<int> numbers{8};
 
-            CHECK(vec[0] == 8);
-            CHECK(vec[1] == 7);
-            CHECK(vec[2] == 6);
+            std::sort(numbers.begin(), numbers.end(), std::greater{});  // sort in reverse order
 
-            std::sort(vec.begin(), vec.end());  // sort back to normal order
+            CHECK(numbers[0] == 8);
+            CHECK(numbers[1] == 7);
+            CHECK(numbers[2] == 6);
 
-            CHECK(vec[0] == 1);
-            CHECK(vec[1] == 2);
-            CHECK(vec[2] == 3);
+            std::sort(numbers.begin(), numbers.end());  // sort back to normal order
+
+            CHECK(numbers[0] == 1);
+            CHECK(numbers[1] == 2);
+            CHECK(numbers[2] == 3);
         }
     }
 }
 
 TEST_CASE("CustomVector::reverse_iterator")
 {
-    CustomVector<int> vec{8};
+    const CustomVector<int> vec{8};
 
     SECTION("iterate values")
     {
@@ -512,8 +591,8 @@ TEST_CASE("CustomVector::reverse_iterator")
         // for any two positive integers x and y, if a + (x + y) is valid, then a + (x + y) is equal to (a + x) + y
         {
             auto a = iter1;
-            const int x = 3;
-            const int y = 7;
+            const int x = 2;
+            const int y = 3;
             CHECK((a + (x + y)) == ((a + x) + y));
         }
 
@@ -618,18 +697,6 @@ TEST_CASE("CustomVector::reverse_iterator")
             CHECK(*(vec.rend() - 3) == 3);
         }
 
-        SECTION("operator[]")
-        {
-            auto it = vec.rbegin();
-
-            CHECK(*it == 8);
-            CHECK(*(it + 1) == 7);
-            CHECK(*(it + 2) == 6);
-            CHECK(it[0] == 8);
-            CHECK(it[1] == 7);
-            CHECK(it[2] == 6);
-        }
-
         SECTION("operator<")
         {
             CHECK(vec.rbegin() < vec.rend());
@@ -668,6 +735,32 @@ TEST_CASE("CustomVector::reverse_iterator")
             CHECK(vec.rend() >= vec.rbegin());
             CHECK((vec.rbegin() + 2) >= (vec.rbegin() + 1));
             CHECK((vec.rbegin() + 2) >= (vec.rbegin() + 2));
+        }
+
+        SECTION("operator[]")
+        {
+            SECTION("const")
+            {
+                auto it = vec.rbegin();
+
+                CHECK(*it == 8);
+                CHECK(*(it + 1) == 7);
+                CHECK(*(it + 2) == 6);
+                CHECK(it[0] == 8);
+                CHECK(it[1] == 7);
+                CHECK(it[2] == 6);
+            }
+
+            SECTION("non-const")
+            {
+                CustomVector<int> numbers{8};
+
+                numbers[0] = 100;
+                numbers[numbers.size() - 1] = 200;
+
+                CHECK(*numbers.rbegin() == 200);
+                CHECK(*(numbers.rend() - 1) == 100);
+            }
         }
     }
 
@@ -730,17 +823,19 @@ TEST_CASE("CustomVector::reverse_iterator")
 
         SECTION("std::sort")
         {
-            std::sort(vec.rbegin(), vec.rend());  // sort in reverse order
+            CustomVector<int> numbers{8};
 
-            CHECK(vec[0] == 8);
-            CHECK(vec[1] == 7);
-            CHECK(vec[2] == 6);
+            std::sort(numbers.rbegin(), numbers.rend());  // sort in reverse order
 
-            std::sort(vec.rbegin(), vec.rend(), std::greater{});  // sort back to normal order
+            CHECK(numbers[0] == 8);
+            CHECK(numbers[1] == 7);
+            CHECK(numbers[2] == 6);
 
-            CHECK(vec[0] == 1);
-            CHECK(vec[1] == 2);
-            CHECK(vec[2] == 3);
+            std::sort(numbers.rbegin(), numbers.rend(), std::greater{});  // sort back to normal order
+
+            CHECK(numbers[0] == 1);
+            CHECK(numbers[1] == 2);
+            CHECK(numbers[2] == 3);
         }
     }
 }
