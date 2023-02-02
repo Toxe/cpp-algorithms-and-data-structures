@@ -330,12 +330,6 @@ TEST_CASE("CustomVector::iterator")
             CHECK(*(vec.end() - 3) == 6);
         }
 
-        SECTION("operator<")
-        {
-            CHECK(vec.begin() < vec.end());
-            CHECK((vec.begin() + 1) < (vec.begin() + 2));
-        }
-
         SECTION("operator==")
         {
             CHECK(vec.begin() == vec.begin());
@@ -346,6 +340,12 @@ TEST_CASE("CustomVector::iterator")
         {
             CHECK(vec.begin() != vec.end());
             CHECK(vec.begin() != (vec.begin() + 1));
+        }
+
+        SECTION("operator<")
+        {
+            CHECK(vec.begin() < vec.end());
+            CHECK((vec.begin() + 1) < (vec.begin() + 2));
         }
 
         SECTION("operator<=")
@@ -697,12 +697,6 @@ TEST_CASE("CustomVector::reverse_iterator")
             CHECK(*(vec.rend() - 3) == 3);
         }
 
-        SECTION("operator<")
-        {
-            CHECK(vec.rbegin() < vec.rend());
-            CHECK((vec.rbegin() + 1) < (vec.rbegin() + 2));
-        }
-
         SECTION("operator==")
         {
             CHECK(vec.rbegin() == vec.rbegin());
@@ -713,6 +707,12 @@ TEST_CASE("CustomVector::reverse_iterator")
         {
             CHECK(vec.rbegin() != vec.rend());
             CHECK(vec.rbegin() != (vec.rbegin() + 1));
+        }
+
+        SECTION("operator<")
+        {
+            CHECK(vec.rbegin() < vec.rend());
+            CHECK((vec.rbegin() + 1) < (vec.rbegin() + 2));
         }
 
         SECTION("operator<=")
