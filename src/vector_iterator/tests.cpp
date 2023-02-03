@@ -19,22 +19,18 @@ std::ostream& operator<<(std::ostream& os, const CustomVector<int>::reverse_iter
 
 TEST_CASE("CustomVector")
 {
-    SECTION("a CustomVector of size 0 contains no elements")
+    SECTION("a default constructed CustomVector is empty")
     {
         const CustomVector<int> vec1;
         const CustomVector<int> vec2{};
-        const CustomVector<int> vec3{0};
-        const CustomVector<int> vec4(0);
 
         CHECK(vec1.size() == 0);
         CHECK(vec2.size() == 0);
-        CHECK(vec3.size() == 0);
-        CHECK(vec4.size() == 0);
     }
 
-    SECTION("can construct CustomVector with number of default elements")
+    SECTION("can construct CustomVector with initializer list")
     {
-        const CustomVector<int> vec{8};
+        const CustomVector<int> vec{1, 2, 3, 4, 5, 6, 7, 8};
 
         CHECK(vec.size() == 8);
 
@@ -46,7 +42,7 @@ TEST_CASE("CustomVector")
     {
         SECTION("const")
         {
-            const CustomVector<int> vec{8};
+            const CustomVector<int> vec{1, 2, 3, 4, 5, 6, 7, 8};
 
             SECTION("begin")
             {
@@ -77,7 +73,7 @@ TEST_CASE("CustomVector")
 
         SECTION("non-const")
         {
-            CustomVector<int> vec{8};
+            CustomVector<int> vec{1, 2, 3, 4, 5, 6, 7, 8};
 
             SECTION("begin")
             {
@@ -108,7 +104,7 @@ TEST_CASE("CustomVector")
 
 TEST_CASE("CustomVector::iterator")
 {
-    const CustomVector<int> vec{8};
+    const CustomVector<int> vec{1, 2, 3, 4, 5, 6, 7, 8};
 
     SECTION("iterate values")
     {
@@ -386,7 +382,7 @@ TEST_CASE("CustomVector::iterator")
 
             SECTION("non-const")
             {
-                CustomVector<int> numbers{8};
+                CustomVector<int> numbers{1, 2, 3, 4, 5, 6, 7, 8};
 
                 numbers[0] = 100;
                 numbers[numbers.size() - 1] = 200;
@@ -456,7 +452,7 @@ TEST_CASE("CustomVector::iterator")
 
         SECTION("std::sort")
         {
-            CustomVector<int> numbers{8};
+            CustomVector<int> numbers{1, 2, 3, 4, 5, 6, 7, 8};
 
             std::sort(numbers.begin(), numbers.end(), std::greater{});  // sort in reverse order
 
@@ -475,7 +471,7 @@ TEST_CASE("CustomVector::iterator")
 
 TEST_CASE("CustomVector::reverse_iterator")
 {
-    const CustomVector<int> vec{8};
+    const CustomVector<int> vec{1, 2, 3, 4, 5, 6, 7, 8};
 
     SECTION("iterate values")
     {
@@ -753,7 +749,7 @@ TEST_CASE("CustomVector::reverse_iterator")
 
             SECTION("non-const")
             {
-                CustomVector<int> numbers{8};
+                CustomVector<int> numbers{1, 2, 3, 4, 5, 6, 7, 8};
 
                 numbers[0] = 100;
                 numbers[numbers.size() - 1] = 200;
@@ -823,7 +819,7 @@ TEST_CASE("CustomVector::reverse_iterator")
 
         SECTION("std::sort")
         {
-            CustomVector<int> numbers{8};
+            CustomVector<int> numbers{1, 2, 3, 4, 5, 6, 7, 8};
 
             std::sort(numbers.rbegin(), numbers.rend());  // sort in reverse order
 

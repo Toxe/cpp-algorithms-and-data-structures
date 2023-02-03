@@ -2,7 +2,6 @@
 
 #include <compare>
 #include <iterator>
-#include <numeric>
 #include <vector>
 
 template <typename T>
@@ -82,16 +81,13 @@ public:
     using reverse_iterator = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    CustomVector(const size_type count = 0)
-        : vector_(count)
-    {
-        std::iota(vector_.begin(), vector_.end(), 1);
-    }
-
-    size_type size() const { return vector_.size(); }
+    CustomVector() : vector_{} { }
+    explicit CustomVector(std::initializer_list<T> init) : vector_{init} { }
 
     reference operator[](const size_type pos) { return vector_[pos]; }
     const_reference operator[](const size_type pos) const { return vector_[pos]; }
+
+    size_type size() const { return vector_.size(); }
 
     iterator begin() { return iterator{vector_.data()}; }
     const_iterator begin() const { return const_iterator{vector_.data()}; }

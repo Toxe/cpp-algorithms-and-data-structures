@@ -7,7 +7,7 @@
 
 int main()
 {
-    CustomVector<int> vec(8);
+    CustomVector<int> vec{1, 2, 3, 4, 5, 6, 7, 8};
 
     // "1 2 3 4 5 6 7 8"
     for (std::size_t i = 0; i < vec.size(); ++i)
