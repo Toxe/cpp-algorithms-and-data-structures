@@ -1,7 +1,9 @@
 #include <algorithm>
 #include <numeric>
 
+#include "catch2/catch_approx.hpp"
 #include "catch2/catch_test_macros.hpp"
+#include "catch2/matchers/catch_matchers_string.hpp"
 #include "fmt/core.h"
 #include "fmt/format.h"
 
@@ -36,6 +38,44 @@ TEST_CASE("CustomVector")
 
         for (std::size_t i = 0; i < vec.size(); ++i)
             CHECK(vec[i] == static_cast<int>(i + 1));
+    }
+
+    SECTION("can use CustomVector with POD types")
+    {
+        int i1 = 10;
+        int i2 = 20;
+
+        const CustomVector<int> vec1{1, 2, 3, 4};
+        const CustomVector<double> vec2{1.0, 2.0, 3.0, 4.0};
+        const CustomVector<int*> vec3{&i1, nullptr, &i2};
+
+        CHECK(vec1[1] == 2);
+        CHECK(vec1[2] == 3);
+        CHECK(vec2[1] == Catch::Approx(2.0));
+        CHECK(vec2[2] == Catch::Approx(3.0));
+        CHECK(vec3[1] == nullptr);
+        CHECK(*vec3[2] == 20);
+    }
+
+    SECTION("can use CustomVector with objects")
+    {
+        struct S {
+            int x, y;
+        };
+
+        const CustomVector<S> vec{{11, 12}, {21, 22}};
+
+        CHECK(vec[0].x == 11);
+        CHECK(vec[1].y == 22);
+    }
+
+    SECTION("can use CustomVector with std::string")
+    {
+        const CustomVector<std::string> vec{"abc", "xyzzy"};
+
+        CHECK(vec.begin()->size() == 3);
+        CHECK_THAT(vec[0], Catch::Matchers::Equals("abc"));
+        CHECK_THAT(vec[1], Catch::Matchers::Equals("xyzzy"));
     }
 
     SECTION("iterators")
@@ -281,6 +321,26 @@ TEST_CASE("CustomVector::iterator")
 
     SECTION("operators")
     {
+        SECTION("operator*")
+        {
+            auto it = vec.begin();
+
+            CHECK(*it == 1);
+        }
+
+        SECTION("operator->")
+        {
+            struct S {
+                int x;
+            };
+
+            CustomVector<S> v{S{1}, S{2}};
+            auto it = v.begin();
+
+            CHECK(it->x == 1);
+            CHECK((++it)->x == 2);
+        }
+
         SECTION("operator++")
         {
             auto it = vec.begin();
@@ -648,6 +708,26 @@ TEST_CASE("CustomVector::reverse_iterator")
 
     SECTION("operators")
     {
+        SECTION("operator*")
+        {
+            auto it = vec.rbegin();
+
+            CHECK(*it == 8);
+        }
+
+        SECTION("operator->")
+        {
+            struct S {
+                int x;
+            };
+
+            const CustomVector<S> v{S{1}, S{2}};
+            auto it = v.rbegin();
+
+            CHECK(it->x == 2);
+            CHECK((++it)->x == 1);
+        }
+
         SECTION("operator++")
         {
             auto it = vec.rbegin();

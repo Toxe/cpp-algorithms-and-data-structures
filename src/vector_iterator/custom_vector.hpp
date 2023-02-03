@@ -18,6 +18,7 @@ private:
         constexpr explicit Iterator(pointer ptr) : ptr_{ptr} { }
 
         reference operator*() const { return *ptr_; }
+        pointer operator->() const { return ptr_; }
 
         Iterator& operator++()
         {
