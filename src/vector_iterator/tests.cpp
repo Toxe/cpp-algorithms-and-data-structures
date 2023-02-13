@@ -78,6 +78,31 @@ TEST_CASE("CustomVector")
         CHECK_THAT(vec[1], Catch::Matchers::Equals("xyzzy"));
     }
 
+    SECTION("operator[]")
+    {
+        SECTION("const")
+        {
+            const CustomVector<int> numbers{1, 2, 3, 4, 5, 6, 7, 8};
+
+            CHECK(numbers[0] == 1);
+            CHECK(numbers[numbers.size() - 1] == 8);
+        }
+
+        SECTION("non-const")
+        {
+            CustomVector<int> numbers{1, 2, 3, 4, 5, 6, 7, 8};
+
+            CHECK(numbers[0] == 1);
+            CHECK(numbers[numbers.size() - 1] == 8);
+
+            numbers[0] = 100;
+            numbers[numbers.size() - 1] = 200;
+
+            CHECK(*numbers.begin() == 100);
+            CHECK(*(numbers.end() - 1) == 200);
+        }
+    }
+
     SECTION("iterators")
     {
         SECTION("const")
@@ -93,8 +118,10 @@ TEST_CASE("CustomVector")
 
                 CHECK(it1 == it2);
                 CHECK(it3 == it4);
-                CHECK(*it1 == *it2);
-                CHECK(*it3 == *it4);
+                CHECK(*it1 == 1);
+                CHECK(*it2 == 1);
+                CHECK(*it3 == 8);
+                CHECK(*it4 == 8);
             }
 
             SECTION("end")
@@ -106,8 +133,10 @@ TEST_CASE("CustomVector")
 
                 CHECK(it1 == it2);
                 CHECK(it3 == it4);
-                CHECK(*(it1 - 1) == *(it2 - 1));
-                CHECK(*(it3 - 1) == *(it4 - 1));
+                CHECK(*(it1 - 1) == 8);
+                CHECK(*(it2 - 1) == 8);
+                CHECK(*(it3 - 1) == 1);
+                CHECK(*(it4 - 1) == 1);
             }
         }
 
@@ -120,6 +149,9 @@ TEST_CASE("CustomVector")
                 auto it1 = vec.begin();
                 auto it2 = vec.rbegin();
 
+                CHECK(*it1 == 1);
+                CHECK(*it2 == 8);
+
                 *it1 = 100;
                 *it2 = 200;
 
@@ -131,6 +163,9 @@ TEST_CASE("CustomVector")
             {
                 auto it1 = vec.end();
                 auto it2 = vec.rend();
+
+                CHECK(*(it1 - 1) == 8);
+                CHECK(*(it2 - 1) == 1);
 
                 *(it1 - 1) = 100;
                 *(it2 - 1) = 200;
@@ -386,44 +421,48 @@ TEST_CASE("CustomVector::iterator")
             CHECK(*(vec.end() - 3) == 6);
         }
 
-        SECTION("operator==")
+        SECTION("operator<=>")
         {
-            CHECK(vec.begin() == vec.begin());
-            CHECK((vec.begin() + 1) == (vec.begin() + 1));
-        }
+            auto begin = vec.begin();
+            auto end = vec.end();
 
-        SECTION("operator!=")
-        {
-            CHECK(vec.begin() != vec.end());
-            CHECK(vec.begin() != (vec.begin() + 1));
-        }
+            SECTION("operator==")
+            {
+                CHECK(begin == begin);
+                CHECK((begin == end) == false);
+            }
 
-        SECTION("operator<")
-        {
-            CHECK(vec.begin() < vec.end());
-            CHECK((vec.begin() + 1) < (vec.begin() + 2));
-        }
+            SECTION("operator!=")
+            {
+                CHECK(begin != end);
+                CHECK((begin != begin) == false);
+            }
 
-        SECTION("operator<=")
-        {
-            CHECK(vec.begin() <= vec.begin());
-            CHECK(vec.begin() <= vec.end());
-            CHECK((vec.begin() + 1) <= (vec.begin() + 2));
-            CHECK((vec.begin() + 2) <= (vec.begin() + 2));
-        }
+            SECTION("operator<")
+            {
+                CHECK(begin < end);
+                CHECK((end < begin) == false);
+            }
 
-        SECTION("operator>")
-        {
-            CHECK(vec.end() > vec.begin());
-            CHECK((vec.begin() + 2) > (vec.begin() + 1));
-        }
+            SECTION("operator<=")
+            {
+                CHECK(begin <= begin);
+                CHECK(begin <= end);
+                CHECK((end <= begin) == false);
+            }
 
-        SECTION("operator>=")
-        {
-            CHECK(vec.begin() >= vec.begin());
-            CHECK(vec.end() >= vec.begin());
-            CHECK((vec.begin() + 2) >= (vec.begin() + 1));
-            CHECK((vec.begin() + 2) >= (vec.begin() + 2));
+            SECTION("operator>")
+            {
+                CHECK(end > begin);
+                CHECK((begin > end) == false);
+            }
+
+            SECTION("operator>=")
+            {
+                CHECK(end >= end);
+                CHECK(end >= begin);
+                CHECK((begin >= end) == false);
+            }
         }
 
         SECTION("operator[]")
@@ -432,9 +471,6 @@ TEST_CASE("CustomVector::iterator")
             {
                 auto it = vec.begin();
 
-                CHECK(*it == 1);
-                CHECK(*(it + 1) == 2);
-                CHECK(*(it + 2) == 3);
                 CHECK(it[0] == 1);
                 CHECK(it[1] == 2);
                 CHECK(it[2] == 3);
@@ -443,12 +479,19 @@ TEST_CASE("CustomVector::iterator")
             SECTION("non-const")
             {
                 CustomVector<int> numbers{1, 2, 3, 4, 5, 6, 7, 8};
+                auto it = numbers.begin();
 
-                numbers[0] = 100;
-                numbers[numbers.size() - 1] = 200;
+                CHECK(it[0] == 1);
+                CHECK(it[1] == 2);
+                CHECK(it[2] == 3);
 
-                CHECK(*numbers.begin() == 100);
-                CHECK(*(numbers.end() - 1) == 200);
+                it[0] = 100;
+                it[1] = 200;
+                it[2] = 300;
+
+                CHECK(numbers[0] == 100);
+                CHECK(numbers[1] == 200);
+                CHECK(numbers[2] == 300);
             }
         }
     }
@@ -541,16 +584,6 @@ TEST_CASE("CustomVector::reverse_iterator")
 
             for (auto it = vec.rbegin(); it != vec.rend(); ++it)
                 sum += *it;
-
-            CHECK(sum == 36);
-        }
-
-        SECTION("range-based for loop")
-        {
-            int sum = 0;
-
-            for (const int i : vec)
-                sum += i;
 
             CHECK(sum == 36);
         }
@@ -773,44 +806,48 @@ TEST_CASE("CustomVector::reverse_iterator")
             CHECK(*(vec.rend() - 3) == 3);
         }
 
-        SECTION("operator==")
+        SECTION("operator<=>")
         {
-            CHECK(vec.rbegin() == vec.rbegin());
-            CHECK((vec.rbegin() + 1) == (vec.rbegin() + 1));
-        }
+            auto begin = vec.rbegin();
+            auto end = vec.rend();
 
-        SECTION("operator!=")
-        {
-            CHECK(vec.rbegin() != vec.rend());
-            CHECK(vec.rbegin() != (vec.rbegin() + 1));
-        }
+            SECTION("operator==")
+            {
+                CHECK(begin == begin);
+                CHECK((begin == end) == false);
+            }
 
-        SECTION("operator<")
-        {
-            CHECK(vec.rbegin() < vec.rend());
-            CHECK((vec.rbegin() + 1) < (vec.rbegin() + 2));
-        }
+            SECTION("operator!=")
+            {
+                CHECK(begin != end);
+                CHECK((begin != begin) == false);
+            }
 
-        SECTION("operator<=")
-        {
-            CHECK(vec.rbegin() <= vec.rbegin());
-            CHECK(vec.rbegin() <= vec.rend());
-            CHECK((vec.rbegin() + 1) <= (vec.rbegin() + 2));
-            CHECK((vec.rbegin() + 2) <= (vec.rbegin() + 2));
-        }
+            SECTION("operator<")
+            {
+                CHECK(begin < end);
+                CHECK((end < begin) == false);
+            }
 
-        SECTION("operator>")
-        {
-            CHECK(vec.rend() > vec.rbegin());
-            CHECK((vec.rbegin() + 2) > (vec.rbegin() + 1));
-        }
+            SECTION("operator<=")
+            {
+                CHECK(begin <= begin);
+                CHECK(begin <= end);
+                CHECK((end <= begin) == false);
+            }
 
-        SECTION("operator>=")
-        {
-            CHECK(vec.rbegin() >= vec.rbegin());
-            CHECK(vec.rend() >= vec.rbegin());
-            CHECK((vec.rbegin() + 2) >= (vec.rbegin() + 1));
-            CHECK((vec.rbegin() + 2) >= (vec.rbegin() + 2));
+            SECTION("operator>")
+            {
+                CHECK(end > begin);
+                CHECK((begin > end) == false);
+            }
+
+            SECTION("operator>=")
+            {
+                CHECK(end >= end);
+                CHECK(end >= begin);
+                CHECK((begin >= end) == false);
+            }
         }
 
         SECTION("operator[]")
@@ -819,9 +856,6 @@ TEST_CASE("CustomVector::reverse_iterator")
             {
                 auto it = vec.rbegin();
 
-                CHECK(*it == 8);
-                CHECK(*(it + 1) == 7);
-                CHECK(*(it + 2) == 6);
                 CHECK(it[0] == 8);
                 CHECK(it[1] == 7);
                 CHECK(it[2] == 6);
@@ -830,12 +864,19 @@ TEST_CASE("CustomVector::reverse_iterator")
             SECTION("non-const")
             {
                 CustomVector<int> numbers{1, 2, 3, 4, 5, 6, 7, 8};
+                auto it = numbers.rbegin();
 
-                numbers[0] = 100;
-                numbers[numbers.size() - 1] = 200;
+                CHECK(it[0] == 8);
+                CHECK(it[1] == 7);
+                CHECK(it[2] == 6);
 
-                CHECK(*numbers.rbegin() == 200);
-                CHECK(*(numbers.rend() - 1) == 100);
+                it[0] = 100;
+                it[1] = 200;
+                it[2] = 300;
+
+                CHECK(numbers[numbers.size() - 3] == 300);
+                CHECK(numbers[numbers.size() - 2] == 200);
+                CHECK(numbers[numbers.size() - 1] == 100);
             }
         }
     }
