@@ -9,14 +9,179 @@
 
 #include "custom_vector.hpp"
 
-std::ostream& operator<<(std::ostream& os, const CustomVector<int>::iterator& iter)
+template <typename Iter>
+void check_bidirectional_iterator_requirements(Iter iter)
 {
-    return os << fmt::format("{} ({})", fmt::ptr(std::addressof(iter)), *iter);
+    // addressof(--a) == addressof(a)
+    {
+        auto a = iter;
+        CHECK(std::addressof(--a) == std::addressof(a));
+    }
+
+    // bool(a-- == b)
+    {
+        auto a = iter;
+        auto b = iter;
+        CHECK(a-- == b);
+    }
+
+    // after evaluating both a-- and --b, bool(a == b) is still true
+    {
+        auto a = iter;
+        auto b = iter;
+        a--;
+        --b;
+        CHECK(a == b);
+    }
+
+    // ++(--a) == b
+    {
+        auto a = iter;
+        auto b = iter;
+        CHECK(++(--a) == b);
+    }
+
+    // --(++a) == b
+    {
+        auto a = iter;
+        auto b = iter;
+        CHECK(--(++a) == b);
+    }
 }
 
-std::ostream& operator<<(std::ostream& os, const CustomVector<int>::reverse_iterator& iter)
+template <typename Iter>
+void check_random_access_iterator_requirements(Iter iter1, Iter iter2)
 {
-    return os << fmt::format("{} ({})", fmt::ptr(std::addressof(iter)), *iter);
+    const auto n = iter2 - iter1;
+
+    // (a += n) is equal to b
+    {
+        auto a = iter1;
+        auto b = iter2;
+        CHECK((a += n) == b);
+    }
+
+    // std::addressof(a += n) is equal to std::addressof(a)
+    {
+        auto a = iter1;
+        CHECK(std::addressof(a += n) == std::addressof(a));
+    }
+
+    // (a + n) is equal to (a += n)
+    {
+        auto a = iter1;
+        auto a2 = iter1;
+        CHECK((a + n) == (a2 += n));
+    }
+
+    // (a + n) is equal to (n + a)
+    {
+        auto a = iter1;
+        CHECK((a + n) == (n + a));
+    }
+
+    // for any two positive integers x and y, if a + (x + y) is valid, then a + (x + y) is equal to (a + x) + y
+    {
+        auto a = iter1;
+        const int x = 2;
+        const int y = 3;
+        CHECK((a + (x + y)) == ((a + x) + y));
+    }
+
+    // a + 0 is equal to a
+    {
+        auto a = iter1;
+        CHECK((a + 0) == a);
+    }
+
+    // if (a + (n - 1)) is valid, then --b is equal to (a + (n - 1))
+    {
+        auto a = iter1;
+        auto b = iter2;
+        CHECK((a + (n - 1)) == --b);
+    }
+
+    // (b += -n) and (b -= n) are both equal to a
+    {
+        auto a = iter1;
+        auto b = iter2;
+        CHECK((b += -n) == a);
+    }
+
+    {
+        auto a = iter1;
+        auto b = iter2;
+        CHECK((b -= n) == a);
+    }
+
+    // std::addressof(b -= n) is equal to std::addressof(b)
+    {
+        auto b = iter2;
+        CHECK(std::addressof(b -= n) == std::addressof(b));
+    }
+
+    // (b - n) is equal to (b -= n)
+    {
+        auto b = iter2;
+        auto b2 = iter2;
+        CHECK((b - n) == (b2 -= n));
+    }
+
+    // if b is dereferenceable, then a[n] is valid and is equal to *b
+    {
+        auto a = iter1;
+        auto b = iter2;
+        CHECK(a[n] == *b);
+    }
+
+    // bool(a <= b) is true
+    {
+        auto a = iter1;
+        auto b = iter2;
+        CHECK(a <= b);
+    }
+}
+
+template <typename Iter>
+void check_spaceship_operator(Iter begin, Iter end)
+{
+    SECTION("operator==")
+    {
+        CHECK(begin == begin);
+        CHECK((begin == end) == false);
+    }
+
+    SECTION("operator!=")
+    {
+        CHECK(begin != end);
+        CHECK((begin != begin) == false);
+    }
+
+    SECTION("operator<")
+    {
+        CHECK(begin < end);
+        CHECK((end < begin) == false);
+    }
+
+    SECTION("operator<=")
+    {
+        CHECK(begin <= begin);
+        CHECK(begin <= end);
+        CHECK((end <= begin) == false);
+    }
+
+    SECTION("operator>")
+    {
+        CHECK(end > begin);
+        CHECK((begin > end) == false);
+    }
+
+    SECTION("operator>=")
+    {
+        CHECK(end >= end);
+        CHECK(end >= begin);
+        CHECK((begin >= end) == false);
+    }
 }
 
 TEST_CASE("CustomVector")
@@ -220,138 +385,12 @@ TEST_CASE("CustomVector::iterator")
 
     SECTION("bidirectional_iterator requirements")
     {
-        auto iter = vec.begin();
-
-        // addressof(--a) == addressof(a)
-        {
-            auto a = iter;
-            CHECK(std::addressof(--a) == std::addressof(a));
-        }
-
-        // bool(a-- == b)
-        {
-            auto a = iter;
-            auto b = iter;
-            CHECK(a-- == b);
-        }
-
-        // after evaluating both a-- and --b, bool(a == b) is still true
-        {
-            auto a = iter;
-            auto b = iter;
-            a--;
-            --b;
-            CHECK(a == b);
-        }
-
-        // ++(--a) == b
-        {
-            auto a = iter;
-            auto b = iter;
-            CHECK(++(--a) == b);
-        }
-
-        // --(++a) == b
-        {
-            auto a = iter;
-            auto b = iter;
-            CHECK(--(++a) == b);
-        }
+        check_bidirectional_iterator_requirements(vec.begin());
     }
 
     SECTION("random_access_iterator requirements")
     {
-        auto iter1 = vec.begin() + 1;
-        auto iter2 = vec.end() - 2;
-
-        const auto n = iter2 - iter1;
-
-        // (a += n) is equal to b
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK((a += n) == b);
-        }
-
-        // std::addressof(a += n) is equal to std::addressof(a)
-        {
-            auto a = iter1;
-            CHECK(std::addressof(a += n) == std::addressof(a));
-        }
-
-        // (a + n) is equal to (a += n)
-        {
-            auto a = iter1;
-            auto a2 = iter1;
-            CHECK((a + n) == (a2 += n));
-        }
-
-        // (a + n) is equal to (n + a)
-        {
-            auto a = iter1;
-            CHECK((a + n) == (n + a));
-        }
-
-        // for any two positive integers x and y, if a + (x + y) is valid, then a + (x + y) is equal to (a + x) + y
-        {
-            auto a = iter1;
-            const int x = 2;
-            const int y = 3;
-            CHECK((a + (x + y)) == ((a + x) + y));
-        }
-
-        // a + 0 is equal to a
-        {
-            auto a = iter1;
-            CHECK((a + 0) == a);
-        }
-
-        // if (a + (n - 1)) is valid, then --b is equal to (a + (n - 1))
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK((a + (n - 1)) == --b);
-        }
-
-        // (b += -n) and (b -= n) are both equal to a
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK((b += -n) == a);
-        }
-
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK((b -= n) == a);
-        }
-
-        // std::addressof(b -= n) is equal to std::addressof(b)
-        {
-            auto b = iter2;
-            CHECK(std::addressof(b -= n) == std::addressof(b));
-        }
-
-        // (b - n) is equal to (b -= n)
-        {
-            auto b = iter2;
-            auto b2 = iter2;
-            CHECK((b - n) == (b2 -= n));
-        }
-
-        // if b is dereferenceable, then a[n] is valid and is equal to *b
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK(a[n] == *b);
-        }
-
-        // bool(a <= b) is true
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK(a <= b);
-        }
+        check_random_access_iterator_requirements(vec.begin() + 1, vec.end() - 2);
     }
 
     SECTION("operators")
@@ -423,46 +462,7 @@ TEST_CASE("CustomVector::iterator")
 
         SECTION("operator<=>")
         {
-            auto begin = vec.begin();
-            auto end = vec.end();
-
-            SECTION("operator==")
-            {
-                CHECK(begin == begin);
-                CHECK((begin == end) == false);
-            }
-
-            SECTION("operator!=")
-            {
-                CHECK(begin != end);
-                CHECK((begin != begin) == false);
-            }
-
-            SECTION("operator<")
-            {
-                CHECK(begin < end);
-                CHECK((end < begin) == false);
-            }
-
-            SECTION("operator<=")
-            {
-                CHECK(begin <= begin);
-                CHECK(begin <= end);
-                CHECK((end <= begin) == false);
-            }
-
-            SECTION("operator>")
-            {
-                CHECK(end > begin);
-                CHECK((begin > end) == false);
-            }
-
-            SECTION("operator>=")
-            {
-                CHECK(end >= end);
-                CHECK(end >= begin);
-                CHECK((begin >= end) == false);
-            }
+            check_spaceship_operator(vec.begin(), vec.end());
         }
 
         SECTION("operator[]")
@@ -605,138 +605,12 @@ TEST_CASE("CustomVector::reverse_iterator")
 
     SECTION("bidirectional_iterator requirements")
     {
-        auto iter = vec.rbegin();
-
-        // addressof(--a) == addressof(a)
-        {
-            auto a = iter;
-            CHECK(std::addressof(--a) == std::addressof(a));
-        }
-
-        // bool(a-- == b)
-        {
-            auto a = iter;
-            auto b = iter;
-            CHECK(a-- == b);
-        }
-
-        // after evaluating both a-- and --b, bool(a == b) is still true
-        {
-            auto a = iter;
-            auto b = iter;
-            a--;
-            --b;
-            CHECK(a == b);
-        }
-
-        // ++(--a) == b
-        {
-            auto a = iter;
-            auto b = iter;
-            CHECK(++(--a) == b);
-        }
-
-        // --(++a) == b
-        {
-            auto a = iter;
-            auto b = iter;
-            CHECK(--(++a) == b);
-        }
+        check_bidirectional_iterator_requirements(vec.rbegin());
     }
 
     SECTION("random_access_iterator requirements")
     {
-        auto iter1 = vec.rbegin() + 1;
-        auto iter2 = vec.rend() - 2;
-
-        const auto n = iter2 - iter1;
-
-        // (a += n) is equal to b
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK((a += n) == b);
-        }
-
-        // std::addressof(a += n) is equal to std::addressof(a)
-        {
-            auto a = iter1;
-            CHECK(std::addressof(a += n) == std::addressof(a));
-        }
-
-        // (a + n) is equal to (a += n)
-        {
-            auto a = iter1;
-            auto a2 = iter1;
-            CHECK((a + n) == (a2 += n));
-        }
-
-        // (a + n) is equal to (n + a)
-        {
-            auto a = iter1;
-            CHECK((a + n) == (n + a));
-        }
-
-        // for any two positive integers x and y, if a + (x + y) is valid, then a + (x + y) is equal to (a + x) + y
-        {
-            auto a = iter1;
-            const int x = 2;
-            const int y = 3;
-            CHECK((a + (x + y)) == ((a + x) + y));
-        }
-
-        // a + 0 is equal to a
-        {
-            auto a = iter1;
-            CHECK((a + 0) == a);
-        }
-
-        // if (a + (n - 1)) is valid, then --b is equal to (a + (n - 1))
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK((a + (n - 1)) == --b);
-        }
-
-        // (b += -n) and (b -= n) are both equal to a
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK((b += -n) == a);
-        }
-
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK((b -= n) == a);
-        }
-
-        // std::addressof(b -= n) is equal to std::addressof(b)
-        {
-            auto b = iter2;
-            CHECK(std::addressof(b -= n) == std::addressof(b));
-        }
-
-        // (b - n) is equal to (b -= n)
-        {
-            auto b = iter2;
-            auto b2 = iter2;
-            CHECK((b - n) == (b2 -= n));
-        }
-
-        // if b is dereferenceable, then a[n] is valid and is equal to *b
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK(a[n] == *b);
-        }
-
-        // bool(a <= b) is true
-        {
-            auto a = iter1;
-            auto b = iter2;
-            CHECK(a <= b);
-        }
+        check_random_access_iterator_requirements(vec.rbegin() + 1, vec.rend() - 2);
     }
 
     SECTION("operators")
@@ -808,46 +682,7 @@ TEST_CASE("CustomVector::reverse_iterator")
 
         SECTION("operator<=>")
         {
-            auto begin = vec.rbegin();
-            auto end = vec.rend();
-
-            SECTION("operator==")
-            {
-                CHECK(begin == begin);
-                CHECK((begin == end) == false);
-            }
-
-            SECTION("operator!=")
-            {
-                CHECK(begin != end);
-                CHECK((begin != begin) == false);
-            }
-
-            SECTION("operator<")
-            {
-                CHECK(begin < end);
-                CHECK((end < begin) == false);
-            }
-
-            SECTION("operator<=")
-            {
-                CHECK(begin <= begin);
-                CHECK(begin <= end);
-                CHECK((end <= begin) == false);
-            }
-
-            SECTION("operator>")
-            {
-                CHECK(end > begin);
-                CHECK((begin > end) == false);
-            }
-
-            SECTION("operator>=")
-            {
-                CHECK(end >= end);
-                CHECK(end >= begin);
-                CHECK((begin >= end) == false);
-            }
+            check_spaceship_operator(vec.rbegin(), vec.rend());
         }
 
         SECTION("operator[]")
