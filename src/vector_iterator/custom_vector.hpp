@@ -11,11 +11,11 @@ private:
     class Iterator {
     public:
         using iterator_category = std::random_access_iterator_tag;
-        using difference_type = std::ptrdiff_t;
         using value_type = T;
+        using difference_type = std::ptrdiff_t;
 
-        constexpr Iterator() : ptr_{} { }
-        constexpr explicit Iterator(pointer ptr) : ptr_{ptr} { }
+        Iterator() : ptr_{} { }
+        explicit Iterator(pointer ptr) : ptr_{ptr} { }
 
         reference operator*() const { return *ptr_; }
         pointer operator->() const { return ptr_; }
@@ -46,24 +46,24 @@ private:
             return tmp;
         }
 
-        Iterator& operator+=(const difference_type n)
+        Iterator& operator+=(const difference_type off)
         {
-            ptr_ += n;
+            ptr_ += off;
             return *this;
         }
 
-        Iterator& operator-=(const difference_type n)
+        Iterator& operator-=(const difference_type off)
         {
-            ptr_ -= n;
+            ptr_ -= off;
             return *this;
         }
 
-        Iterator operator+(const difference_type n) const { return Iterator{ptr_ + n}; }
-        Iterator operator-(const difference_type n) const { return Iterator{ptr_ - n}; }
-        friend Iterator operator+(const difference_type n, const Iterator& a) { return Iterator{a.ptr_ + n}; }
+        Iterator operator+(const difference_type off) const { return Iterator{ptr_ + off}; }
+        Iterator operator-(const difference_type off) const { return Iterator{ptr_ - off}; }
+        friend Iterator operator+(const difference_type off, const Iterator& a) { return Iterator{a.ptr_ + off}; }
         friend difference_type operator-(const Iterator& a, const Iterator& b) { return a.ptr_ - b.ptr_; };
 
-        reference operator[](const difference_type n) const { return *(ptr_ + n); }
+        reference operator[](const difference_type off) const { return *(ptr_ + off); }
 
         auto operator<=>(const Iterator& other) const = default;
 
