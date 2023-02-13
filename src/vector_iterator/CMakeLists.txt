@@ -17,7 +17,7 @@ if(BUILD_TESTING)
         custom_vector.hpp
     )
 
-    set_target_properties(vector_iterator_tests PROPERTIES CXX_EXTENSIONS OFF OUTPUT_NAME tests)
+    set_target_properties(vector_iterator_tests PROPERTIES CXX_EXTENSIONS OFF)
     target_compile_features(vector_iterator_tests PUBLIC cxx_std_20)
     target_compile_options(vector_iterator_tests PRIVATE ${SANITIZER_COMPILE_OPTIONS} ${DEFAULT_COMPILER_OPTIONS} ${DEFAULT_COMPILER_WARNINGS})
     target_link_options(vector_iterator_tests PRIVATE ${SANITIZER_LINK_OPTIONS})
