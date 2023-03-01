@@ -395,6 +395,11 @@ TEST_CASE("CustomVector::iterator")
 
     SECTION("operators")
     {
+        SECTION("operator<=>")
+        {
+            check_spaceship_operator(vec.begin(), vec.end());
+        }
+
         SECTION("operator*")
         {
             auto it = vec.begin();
@@ -458,11 +463,6 @@ TEST_CASE("CustomVector::iterator")
         SECTION("operator-")
         {
             CHECK(*(vec.end() - 3) == 6);
-        }
-
-        SECTION("operator<=>")
-        {
-            check_spaceship_operator(vec.begin(), vec.end());
         }
 
         SECTION("operator[]")
@@ -615,6 +615,11 @@ TEST_CASE("CustomVector::reverse_iterator")
 
     SECTION("operators")
     {
+        SECTION("operator<=>")
+        {
+            check_spaceship_operator(vec.rbegin(), vec.rend());
+        }
+
         SECTION("operator*")
         {
             auto it = vec.rbegin();
@@ -678,11 +683,6 @@ TEST_CASE("CustomVector::reverse_iterator")
         SECTION("operator-")
         {
             CHECK(*(vec.rend() - 3) == 3);
-        }
-
-        SECTION("operator<=>")
-        {
-            check_spaceship_operator(vec.rbegin(), vec.rend());
         }
 
         SECTION("operator[]")

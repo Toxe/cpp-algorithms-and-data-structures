@@ -65,7 +65,7 @@ private:
 
         reference operator[](const difference_type off) const { return *(ptr_ + off); }
 
-        auto operator<=>(const Iterator& other) const = default;
+        auto operator<=>(const Iterator&) const = default;
 
     private:
         pointer ptr_;
@@ -73,8 +73,8 @@ private:
 
 public:
     using pointer = T*;
-    using const_pointer = const T*;
     using reference = T&;
+    using const_pointer = const T*;
     using const_reference = const T&;
     using size_type = std::size_t;
     using iterator = Iterator<pointer, reference>;
@@ -84,9 +84,6 @@ public:
 
     CustomVector() : vector_{} { }
     explicit CustomVector(std::initializer_list<T> init) : vector_{init} { }
-
-    reference operator[](const size_type pos) { return vector_[pos]; }
-    const_reference operator[](const size_type pos) const { return vector_[pos]; }
 
     size_type size() const { return vector_.size(); }
 
@@ -105,6 +102,9 @@ public:
     reverse_iterator rend() { return reverse_iterator{begin()}; }
     const_reverse_iterator rend() const { return const_reverse_iterator{begin()}; }
     const_reverse_iterator crend() const { return rend(); }
+
+    reference operator[](const size_type pos) { return vector_[pos]; }
+    const_reference operator[](const size_type pos) const { return vector_[pos]; }
 
 private:
     std::vector<T> vector_;
