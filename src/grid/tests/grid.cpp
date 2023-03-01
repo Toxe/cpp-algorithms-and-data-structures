@@ -6,7 +6,7 @@
 #include "fmt/core.h"
 #include "fmt/format.h"
 
-#include "grid.hpp"
+#include "../grid.hpp"
 
 Grid<int> create_grid_with_test_values(const int rows, const int cols)
 {

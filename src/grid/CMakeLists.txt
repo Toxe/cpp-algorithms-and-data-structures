@@ -12,7 +12,7 @@ target_link_options(grid PRIVATE ${SANITIZER_LINK_OPTIONS})
 # tests
 if(BUILD_TESTING)
     add_executable(grid_tests
-        tests.cpp
+        tests/grid.cpp
         grid.hpp
     )
 
