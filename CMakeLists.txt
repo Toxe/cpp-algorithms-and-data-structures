@@ -20,6 +20,7 @@ include(cmake/StaticAnalyzers.cmake)
 include(cmake/Sanitizers.cmake)
 
 find_package(fmt CONFIG REQUIRED)
+find_path(NANOBENCH_INCLUDE_DIRS nanobench.h)
 
 add_subdirectory(src/grid)
 add_subdirectory(src/vector_iterator)
