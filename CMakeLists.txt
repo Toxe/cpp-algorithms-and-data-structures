@@ -21,4 +21,5 @@ include(cmake/Sanitizers.cmake)
 
 find_package(fmt CONFIG REQUIRED)
 
+add_subdirectory(src/grid)
 add_subdirectory(src/vector_iterator)
