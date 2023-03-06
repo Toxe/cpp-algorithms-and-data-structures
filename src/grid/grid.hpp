@@ -326,6 +326,8 @@ public:
     using grid_cols_type = GridRowsOrCols<pointer, reference>;
     using const_grid_rows_type = GridRowsOrCols<const_pointer, const_reference>;
     using const_grid_cols_type = GridRowsOrCols<const_pointer, const_reference>;
+    using grid_cell_type = GridCell<Grid<T>*>;
+    using const_grid_cell_type = GridCell<const Grid<T>*>;
 
     Grid(size_type rows, size_type cols);
     Grid(size_type rows, size_type cols, const T& at);
@@ -344,8 +346,11 @@ public:
     [[nodiscard]] reference at(const Coords& coords) { return at(coords.y, coords.x); }
     [[nodiscard]] const_reference at(const Coords& coords) const { return at(coords.y, coords.x); }
 
-    [[nodiscard]] GridCell<T> cell(size_type row, size_type col) { return cell(Coords{static_cast<int>(col), static_cast<int>(row)}); }
-    [[nodiscard]] GridCell<T> cell(const Coords& coords) { return GridCell<T>{this, coords}; }
+    [[nodiscard]] grid_cell_type cell(const Coords& coords) { return grid_cell_type{this, coords}; }
+    [[nodiscard]] grid_cell_type cell(size_type row, size_type col) { return cell(Coords{static_cast<int>(col), static_cast<int>(row)}); }
+
+    [[nodiscard]] const_grid_cell_type cell(const Coords& coords) const { return const_grid_cell_type{this, coords}; }
+    [[nodiscard]] const_grid_cell_type cell(size_type row, size_type col) const { return cell(Coords{static_cast<int>(col), static_cast<int>(row)}); }
 
     auto begin() { return data_.begin(); }
     auto begin() const { return data_.cbegin(); }
