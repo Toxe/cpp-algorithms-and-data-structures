@@ -1,7 +1,9 @@
 # main executable
 add_executable(grid
     main.cpp
+    coords.hpp
     grid.hpp
+    gridcell.hpp
 )
 
 set_target_properties(grid PROPERTIES CXX_EXTENSIONS OFF)
@@ -13,8 +15,12 @@ target_link_libraries(grid PRIVATE ${SANITIZER_LINK_LIBRARIES} fmt::fmt)
 # tests
 if(BUILD_TESTING)
     add_executable(grid_tests
+        tests/coords.cpp
         tests/grid.cpp
+        tests/gridcell.cpp
+        coords.hpp
         grid.hpp
+        gridcell.hpp
     )
 
     set_target_properties(grid_tests PROPERTIES CXX_EXTENSIONS OFF)
@@ -29,7 +35,9 @@ endif()
 # benchmark
 add_executable(grid_benchmark
     benchmark.cpp
+    coords.hpp
     grid.hpp
+    gridcell.hpp
 )
 
 set_target_properties(grid_benchmark PROPERTIES CXX_EXTENSIONS OFF)

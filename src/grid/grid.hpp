@@ -5,6 +5,8 @@
 #include <iterator>
 #include <vector>
 
+#include "gridcell.hpp"
+
 template <typename T>
 class Grid {
 public:
@@ -339,6 +341,12 @@ public:
     [[nodiscard]] reference at(size_type row, size_type col);
     [[nodiscard]] const_reference at(size_type row, size_type col) const;
 
+    [[nodiscard]] reference at(const Coords& coords) { return at(coords.y, coords.x); }
+    [[nodiscard]] const_reference at(const Coords& coords) const { return at(coords.y, coords.x); }
+
+    [[nodiscard]] GridCell<T> cell(size_type row, size_type col) { return cell(Coords{static_cast<int>(col), static_cast<int>(row)}); }
+    [[nodiscard]] GridCell<T> cell(const Coords& coords) { return GridCell<T>{this, coords}; }
+
     auto begin() { return data_.begin(); }
     auto begin() const { return data_.cbegin(); }
     auto cbegin() const { return data_.cbegin(); }
@@ -375,6 +383,7 @@ private:
     std::vector<T> data_;
 
     [[nodiscard]] size_type idx(size_type row, size_type col) const;
+    [[nodiscard]] size_type idx(const Coords& coords) const { return idx(coords.y, coords.x); }
 };
 
 template <typename T>

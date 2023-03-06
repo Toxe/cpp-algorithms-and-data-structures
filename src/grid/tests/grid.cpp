@@ -781,16 +781,16 @@ TEST_CASE("Grid")
             CHECK(grid.at(0, 1) == 12);
             CHECK(grid.at(1, 0) == 21);
             CHECK(grid.at(2, 3) == 34);
+
+            CHECK(grid.at(Coords{0, 0}) == 11);
+            CHECK(grid.at(Coords{1, 0}) == 12);
+            CHECK(grid.at(Coords{0, 1}) == 21);
+            CHECK(grid.at(Coords{3, 2}) == 34);
         }
 
         SECTION("non-const")
         {
             Grid<int> grid = create_grid_with_test_values(3, 4);
-
-            CHECK(grid.at(0, 0) == 11);
-            CHECK(grid.at(0, 1) == 12);
-            CHECK(grid.at(1, 0) == 21);
-            CHECK(grid.at(2, 3) == 34);
 
             grid.at(0, 0) = 111;
             grid.at(0, 1) = 222;
@@ -801,6 +801,16 @@ TEST_CASE("Grid")
             CHECK(grid.at(0, 1) == 222);
             CHECK(grid.at(1, 0) == 333);
             CHECK(grid.at(2, 3) == 444);
+
+            grid.at(Coords{0, 0}) = 1111;
+            grid.at(Coords{1, 0}) = 2222;
+            grid.at(Coords{0, 1}) = 3333;
+            grid.at(Coords{3, 2}) = 4444;
+
+            CHECK(grid.at(0, 0) == 1111);
+            CHECK(grid.at(0, 1) == 2222);
+            CHECK(grid.at(1, 0) == 3333);
+            CHECK(grid.at(2, 3) == 4444);
         }
     }
 
