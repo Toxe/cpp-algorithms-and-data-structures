@@ -105,7 +105,7 @@ private:
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-        RowOrCol() : ptr_{}, size_{}, value_iter_stride_{} { }
+        RowOrCol() : ptr_{}, size_{}, stride_{}, value_iter_stride_{} { }
         RowOrCol(pointer ptr, const size_type size, const difference_type stride, const difference_type value_iter_stride)
         {
             assert(ptr != nullptr);
@@ -340,8 +340,8 @@ public:
     pointer data() { return data_.data(); }
     const_pointer data() const { return data_.data(); }
 
-    [[nodiscard]] reference at(size_type row, size_type col);
-    [[nodiscard]] const_reference at(size_type row, size_type col) const;
+    [[nodiscard]] inline reference at(size_type row, size_type col);
+    [[nodiscard]] inline const_reference at(size_type row, size_type col) const;
 
     [[nodiscard]] reference at(const Coords& coords) { return at(coords.y, coords.x); }
     [[nodiscard]] const_reference at(const Coords& coords) const { return at(coords.y, coords.x); }
@@ -387,7 +387,7 @@ private:
 
     std::vector<T> data_;
 
-    [[nodiscard]] size_type idx(size_type row, size_type col) const;
+    [[nodiscard]] inline size_type idx(size_type row, size_type col) const;
     [[nodiscard]] size_type idx(const Coords& coords) const { return idx(coords.y, coords.x); }
 };
 

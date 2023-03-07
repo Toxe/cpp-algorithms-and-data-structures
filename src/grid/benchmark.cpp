@@ -26,6 +26,26 @@ void benchmark_create_grid()
     }
 }
 
+void benchmark_sum_baseline()
+{
+    for (auto size : {4, 16, 256, 1024}) {
+        std::vector<int> vec(static_cast<std::size_t>(size * size));
+
+        for (int row = 0; row < size; ++row)
+            for (int col = 0; col < size; ++col)
+                vec[static_cast<std::size_t>(row * size + col)] = (row + 1) * 10 + col + 1;
+
+        ankerl::nanobench::Bench().run(fmt::format("sum baseline: {}x{}", size, size), [&] {
+            int sum = 0;
+
+            for (const auto i : vec)
+                sum += i;
+
+            ankerl::nanobench::doNotOptimizeAway(sum);
+        });
+    }
+}
+
 void benchmark_sum_vector()
 {
     for (auto size : {4, 16, 256, 1024}) {
@@ -34,7 +54,7 @@ void benchmark_sum_vector()
         ankerl::nanobench::Bench().run(fmt::format("sum vector: {}x{}", size, size), [&] {
             int sum = 0;
 
-            for (const auto& i : grid)
+            for (const auto i : grid)
                 sum += i;
 
             ankerl::nanobench::doNotOptimizeAway(sum);
@@ -123,6 +143,7 @@ void benchmark_sum_cell_cols()
 int main()
 {
     benchmark_create_grid();
+    benchmark_sum_baseline();
     benchmark_sum_vector();
     benchmark_sum_rows();
     benchmark_sum_cols();

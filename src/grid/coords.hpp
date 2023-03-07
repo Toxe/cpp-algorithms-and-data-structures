@@ -18,18 +18,18 @@ struct Coords {
         y += delta.y;
     }
 
-    void move_horizontally(const int distance) { move(distance, 0); }
-    void move_vertically(const int distance) { move(0, distance); }
+    void move_horizontally(const int distance) { x += distance; }
+    void move_vertically(const int distance) { y += distance; }
 
-    void move_up(const int distance = 1) { move(0, -distance); }
-    void move_down(const int distance = 1) { move(0, distance); }
-    void move_left(const int distance = 1) { move(-distance, 0); }
-    void move_right(const int distance = 1) { move(distance, 0); }
+    void move_up(const int distance = 1) { move_vertically(-distance); }
+    void move_down(const int distance = 1) { move_vertically(distance); }
+    void move_left(const int distance = 1) { move_horizontally(-distance); }
+    void move_right(const int distance = 1) { move_horizontally(distance); }
 
-    void move_north(const int distance = 1) { move(0, -distance); }
-    void move_south(const int distance = 1) { move(0, distance); }
-    void move_west(const int distance = 1) { move(-distance, 0); }
-    void move_east(const int distance = 1) { move(distance, 0); }
+    void move_north(const int distance = 1) { move_vertically(-distance); }
+    void move_south(const int distance = 1) { move_vertically(distance); }
+    void move_west(const int distance = 1) { move_horizontally(-distance); }
+    void move_east(const int distance = 1) { move_horizontally(distance); }
 
     Coords operator+(const Coords& other) const { return Coords{x + other.x, y + other.y}; }
     Coords operator-(const Coords& other) const { return Coords{x - other.x, y - other.y}; }
