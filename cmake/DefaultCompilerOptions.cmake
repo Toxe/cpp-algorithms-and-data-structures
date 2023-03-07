@@ -13,6 +13,7 @@ set(DEFAULT_GCC_OPTIONS
 # MSVC specific options
 set(DEFAULT_MSVC_OPTIONS
         /permissive-
+        /diagnostics:caret
 )
 
 # Clang-cl specific options
