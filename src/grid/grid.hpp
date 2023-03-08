@@ -318,6 +318,7 @@ private:
     };
 
 public:
+    using value_type = T;
     using pointer = T*;
     using reference = T&;
     using const_pointer = const T*;
