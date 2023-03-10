@@ -330,8 +330,8 @@ public:
     using grid_cell_type = GridCell<Grid<T>*>;
     using const_grid_cell_type = GridCell<const Grid<T>*>;
 
-    Grid(size_type rows, size_type cols);
-    Grid(size_type rows, size_type cols, const T& at);
+    Grid(size_type cols, size_type rows);
+    Grid(size_type cols, size_type rows, const T& at);
 
     size_type width() const { return cols_; }
     size_type height() const { return rows_; }
@@ -341,17 +341,17 @@ public:
     pointer data() { return data_.data(); }
     const_pointer data() const { return data_.data(); }
 
-    [[nodiscard]] inline reference at(size_type row, size_type col);
-    [[nodiscard]] inline const_reference at(size_type row, size_type col) const;
+    [[nodiscard]] inline reference at(size_type col, size_type row);
+    [[nodiscard]] inline const_reference at(size_type col, size_type row) const;
 
-    [[nodiscard]] reference at(const Coords& coords) { return at(coords.y, coords.x); }
-    [[nodiscard]] const_reference at(const Coords& coords) const { return at(coords.y, coords.x); }
+    [[nodiscard]] reference at(const Coords& coords) { return at(coords.x, coords.y); }
+    [[nodiscard]] const_reference at(const Coords& coords) const { return at(coords.x, coords.y); }
 
     [[nodiscard]] grid_cell_type cell(const Coords& coords) { return grid_cell_type{this, coords}; }
-    [[nodiscard]] grid_cell_type cell(size_type row, size_type col) { return cell(Coords{static_cast<int>(col), static_cast<int>(row)}); }
+    [[nodiscard]] grid_cell_type cell(size_type col, size_type row) { return cell(Coords{static_cast<int>(col), static_cast<int>(row)}); }
 
     [[nodiscard]] const_grid_cell_type cell(const Coords& coords) const { return const_grid_cell_type{this, coords}; }
-    [[nodiscard]] const_grid_cell_type cell(size_type row, size_type col) const { return cell(Coords{static_cast<int>(col), static_cast<int>(row)}); }
+    [[nodiscard]] const_grid_cell_type cell(size_type col, size_type row) const { return cell(Coords{static_cast<int>(col), static_cast<int>(row)}); }
 
     auto begin() { return data_.begin(); }
     auto begin() const { return data_.cbegin(); }
@@ -383,51 +383,51 @@ public:
     auto operator[](const size_type pos) const { return row(pos); }
 
 private:
-    size_type rows_;
     size_type cols_;
+    size_type rows_;
 
     std::vector<T> data_;
 
-    [[nodiscard]] inline size_type idx(size_type row, size_type col) const;
-    [[nodiscard]] size_type idx(const Coords& coords) const { return idx(coords.y, coords.x); }
+    [[nodiscard]] inline size_type idx(size_type col, size_type row) const;
+    [[nodiscard]] size_type idx(const Coords& coords) const { return idx(coords.x, coords.y); }
 };
 
 template <typename T>
-Grid<T>::Grid(const size_type rows, const size_type cols)
+Grid<T>::Grid(const size_type cols, const size_type rows)
 {
-    assert(rows > 0 && cols > 0);
-    rows_ = rows;
+    assert(cols > 0 && rows > 0);
     cols_ = cols;
-    data_ = std::vector<T>(static_cast<std::size_t>(rows * cols));
-}
-
-template <typename T>
-Grid<T>::Grid(const size_type rows, const size_type cols, const T& at)
-{
-    assert(rows > 0 && cols > 0);
     rows_ = rows;
+    data_ = std::vector<T>(static_cast<std::size_t>(cols * rows));
+}
+
+template <typename T>
+Grid<T>::Grid(const size_type cols, const size_type rows, const T& at)
+{
+    assert(cols > 0 && rows > 0);
     cols_ = cols;
-    data_ = std::vector<T>(static_cast<std::size_t>(rows * cols), at);
+    rows_ = rows;
+    data_ = std::vector<T>(static_cast<std::size_t>(cols * rows), at);
 }
 
 template <typename T>
-typename Grid<T>::reference Grid<T>::at(const size_type row, const size_type col)
+typename Grid<T>::reference Grid<T>::at(const size_type col, const size_type row)
 {
-    assert(idx(row, col) < size());
-    return data_[static_cast<std::size_t>(idx(row, col))];
+    assert(idx(col, row) < size());
+    return data_[static_cast<std::size_t>(idx(col, row))];
 }
 
 template <typename T>
-typename Grid<T>::const_reference Grid<T>::at(const size_type row, const size_type col) const
+typename Grid<T>::const_reference Grid<T>::at(const size_type col, const size_type row) const
 {
-    assert(idx(row, col) < size());
-    return data_[static_cast<std::size_t>(idx(row, col))];
+    assert(idx(col, row) < size());
+    return data_[static_cast<std::size_t>(idx(col, row))];
 }
 
 template <typename T>
-typename Grid<T>::size_type Grid<T>::idx(const size_type row, const size_type col) const
+typename Grid<T>::size_type Grid<T>::idx(const size_type col, const size_type row) const
 {
-    assert(row >= 0 && row < rows_);
     assert(col >= 0 && col < cols_);
+    assert(row >= 0 && row < rows_);
     return row * cols_ + col;
 }
