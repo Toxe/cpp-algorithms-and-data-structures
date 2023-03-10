@@ -257,11 +257,11 @@ void check_iterator_operations(Iterator begin, Iterator end, Values values, GetV
     }
 }
 
-// GridRows or GridCols
-template <typename GridRows_or_GridCols, typename Values>
-void gridrows_or_gridcols_check_basic_functionality(GridRows_or_GridCols rows_or_cols, Values values)
+// GridRowsOrCols
+template <typename GridRowsOrCols, typename Values>
+void grid_rows_or_cols_check_basic_functionality(GridRowsOrCols rows_or_cols, Values values)
 {
-    const auto num_values = static_cast<typename GridRows_or_GridCols::size_type>(values.size());
+    const auto num_values = static_cast<typename GridRowsOrCols::size_type>(values.size());
 
     SECTION("size() returns the number of Grid rows/cols")
     {
@@ -279,8 +279,8 @@ void gridrows_or_gridcols_check_basic_functionality(GridRows_or_GridCols rows_or
     }
 }
 
-template <typename Const_GridRows_or_GridCols, typename NonConst_GridRows_or_GridCols, typename Values>
-void gridrows_or_gridcols_check_iterators(Const_GridRows_or_GridCols const_rows_or_cols, NonConst_GridRows_or_GridCols non_const_rows_or_cols, Values values)
+template <typename Const_GridRowsOrCols, typename NonConst_GridRowsOrCols, typename Values>
+void grid_rows_or_cols_check_iterators(Const_GridRowsOrCols const_rows_or_cols, NonConst_GridRowsOrCols non_const_rows_or_cols, Values values)
 {
     SECTION("const")
     {
@@ -349,8 +349,8 @@ void gridrows_or_gridcols_check_iterators(Const_GridRows_or_GridCols const_rows_
     }
 }
 
-template <typename Const_GridRows_or_GridCols, typename NonConst_GridRows_or_GridCols, typename Values>
-void gridrows_or_gridcols_check_operators(Const_GridRows_or_GridCols const_rows_or_cols, NonConst_GridRows_or_GridCols non_const_rows_or_cols, Values values)
+template <typename Const_GridRowsOrCols, typename NonConst_GridRowsOrCols, typename Values>
+void grid_rows_or_cols_check_operators(Const_GridRowsOrCols const_rows_or_cols, NonConst_GridRowsOrCols non_const_rows_or_cols, Values values)
 {
     SECTION("operator[]")
     {
@@ -378,7 +378,7 @@ void gridrows_or_gridcols_check_operators(Const_GridRows_or_GridCols const_rows_
     }
 }
 
-// Row or Col
+// RowOrCol
 template <typename RowOrCol, typename Values>
 void row_or_col_check_basic_functionality(RowOrCol row_or_col, Values values, Values other_row_or_col_values)
 {
@@ -532,9 +532,9 @@ void row_or_col_check_other_operators(ConstRowOrCol const_row_or_col, NonConstRo
     }
 }
 
-// RowIterator
-template <typename RowIterator, typename Values>
-void row_iterator_check_other_operators(RowIterator begin, RowIterator end, Values values)
+// RowOrColIterator
+template <typename RowOrColIterator, typename Values>
+void row_or_col_iterator_check_other_operators(RowOrColIterator begin, RowOrColIterator end, Values values)
 {
     SECTION("operator*")
     {
@@ -603,8 +603,8 @@ void row_iterator_check_other_operators(RowIterator begin, RowIterator end, Valu
     }
 }
 
-template <typename RowIterator, typename Values>
-void row_iterator_check_modifying_values(RowIterator it, Values values)
+template <typename RowOrColIterator, typename Values>
+void row_or_col_iterator_check_modifying_values(RowOrColIterator it, Values values)
 {
     REQUIRE(it[1].front() == values[1]);
     REQUIRE(it[2].front() == values[2]);
@@ -1105,18 +1105,18 @@ TEST_CASE("Grid::GridRows")
 
     SECTION("basic functionality")
     {
-        gridrows_or_gridcols_check_basic_functionality(const_rows, first_value_of_each_row_test_values);
-        gridrows_or_gridcols_check_basic_functionality(non_const_rows, first_value_of_each_row_test_values);
+        grid_rows_or_cols_check_basic_functionality(const_rows, first_value_of_each_row_test_values);
+        grid_rows_or_cols_check_basic_functionality(non_const_rows, first_value_of_each_row_test_values);
     }
 
     SECTION("iterators")
     {
-        gridrows_or_gridcols_check_iterators(const_rows, non_const_rows, first_value_of_each_row_test_values);
+        grid_rows_or_cols_check_iterators(const_rows, non_const_rows, first_value_of_each_row_test_values);
     }
 
     SECTION("operators")
     {
-        gridrows_or_gridcols_check_operators(const_rows, non_const_rows, first_value_of_each_row_test_values);
+        grid_rows_or_cols_check_operators(const_rows, non_const_rows, first_value_of_each_row_test_values);
     }
 }
 
@@ -1132,18 +1132,18 @@ TEST_CASE("Grid::GridCols")
 
     SECTION("basic functionality")
     {
-        gridrows_or_gridcols_check_basic_functionality(const_cols, first_value_of_each_col_test_values);
-        gridrows_or_gridcols_check_basic_functionality(non_const_cols, first_value_of_each_col_test_values);
+        grid_rows_or_cols_check_basic_functionality(const_cols, first_value_of_each_col_test_values);
+        grid_rows_or_cols_check_basic_functionality(non_const_cols, first_value_of_each_col_test_values);
     }
 
     SECTION("iterators")
     {
-        gridrows_or_gridcols_check_iterators(const_cols, non_const_cols, first_value_of_each_col_test_values);
+        grid_rows_or_cols_check_iterators(const_cols, non_const_cols, first_value_of_each_col_test_values);
     }
 
     SECTION("operators")
     {
-        gridrows_or_gridcols_check_operators(const_cols, non_const_cols, first_value_of_each_col_test_values);
+        grid_rows_or_cols_check_operators(const_cols, non_const_cols, first_value_of_each_col_test_values);
     }
 }
 
@@ -1295,8 +1295,8 @@ TEST_CASE("Grid::GridRows::iterator")
 
             SECTION("other operators")
             {
-                row_iterator_check_other_operators(const_rows.begin(), const_rows.end(), test_values);
-                row_iterator_check_other_operators(non_const_rows.begin(), non_const_rows.end(), test_values);
+                row_or_col_iterator_check_other_operators(const_rows.begin(), const_rows.end(), test_values);
+                row_or_col_iterator_check_other_operators(non_const_rows.begin(), non_const_rows.end(), test_values);
             }
         }
     }
@@ -1305,7 +1305,7 @@ TEST_CASE("Grid::GridRows::iterator")
     {
         Grid<int> non_const_grid = create_grid_with_test_values(4, 5);
 
-        row_iterator_check_modifying_values(non_const_grid.rows().begin(), test_values);
+        row_or_col_iterator_check_modifying_values(non_const_grid.rows().begin(), test_values);
     }
 }
 
@@ -1374,8 +1374,8 @@ TEST_CASE("Grid::GridRows::reverse_iterator")
 
             SECTION("other operators")
             {
-                row_iterator_check_other_operators(const_rows.rbegin(), const_rows.rend(), test_values);
-                row_iterator_check_other_operators(non_const_rows.rbegin(), non_const_rows.rend(), test_values);
+                row_or_col_iterator_check_other_operators(const_rows.rbegin(), const_rows.rend(), test_values);
+                row_or_col_iterator_check_other_operators(non_const_rows.rbegin(), non_const_rows.rend(), test_values);
             }
         }
     }
@@ -1384,7 +1384,7 @@ TEST_CASE("Grid::GridRows::reverse_iterator")
     {
         Grid<int> non_const_grid = create_grid_with_test_values(4, 5);
 
-        row_iterator_check_modifying_values(non_const_grid.rows().rbegin(), test_values);
+        row_or_col_iterator_check_modifying_values(non_const_grid.rows().rbegin(), test_values);
     }
 }
 
@@ -1464,8 +1464,8 @@ TEST_CASE("Grid::GridCols::iterator")
 
             SECTION("other operators")
             {
-                row_iterator_check_other_operators(const_cols.begin(), const_cols.end(), test_values);
-                row_iterator_check_other_operators(non_const_cols.begin(), non_const_cols.end(), test_values);
+                row_or_col_iterator_check_other_operators(const_cols.begin(), const_cols.end(), test_values);
+                row_or_col_iterator_check_other_operators(non_const_cols.begin(), non_const_cols.end(), test_values);
             }
         }
     }
@@ -1474,7 +1474,7 @@ TEST_CASE("Grid::GridCols::iterator")
     {
         Grid<int> non_const_grid = create_grid_with_test_values(4, 5);
 
-        row_iterator_check_modifying_values(non_const_grid.cols().begin(), test_values);
+        row_or_col_iterator_check_modifying_values(non_const_grid.cols().begin(), test_values);
     }
 }
 
@@ -1554,8 +1554,8 @@ TEST_CASE("Grid::GridCols::reverse_iterator")
 
             SECTION("other operators")
             {
-                row_iterator_check_other_operators(const_cols.rbegin(), const_cols.rend(), test_values);
-                row_iterator_check_other_operators(non_const_cols.rbegin(), non_const_cols.rend(), test_values);
+                row_or_col_iterator_check_other_operators(const_cols.rbegin(), const_cols.rend(), test_values);
+                row_or_col_iterator_check_other_operators(non_const_cols.rbegin(), non_const_cols.rend(), test_values);
             }
         }
     }
@@ -1564,7 +1564,7 @@ TEST_CASE("Grid::GridCols::reverse_iterator")
     {
         Grid<int> non_const_grid = create_grid_with_test_values(4, 5);
 
-        row_iterator_check_modifying_values(non_const_grid.cols().rbegin(), test_values);
+        row_or_col_iterator_check_modifying_values(non_const_grid.cols().rbegin(), test_values);
     }
 }
 
