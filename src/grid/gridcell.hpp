@@ -13,9 +13,6 @@ public:
         grid_ = grid;
     }
 
-    [[nodiscard]] int col() const { return x; }
-    [[nodiscard]] int row() const { return y; }
-
     [[nodiscard]] auto& value() { return grid_->at(*this); }
 
 private:

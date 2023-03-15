@@ -6,6 +6,9 @@ struct Coords {
     int x = 0;
     int y = 0;
 
+    [[nodiscard]] int col() const { return x; }
+    [[nodiscard]] int row() const { return y; }
+
     void move(const int dx, const int dy)
     {
         x += dx;

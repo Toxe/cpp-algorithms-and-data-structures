@@ -6,25 +6,6 @@ Grid<int> create_grid_with_test_values(int cols, int rows);
 
 TEST_CASE("GridCell")
 {
-    SECTION("can get coordinates")
-    {
-        const Grid<int> grid = create_grid_with_test_values(4, 5);
-        auto cell1 = grid.cell(1, 2);
-        auto cell2 = grid.cell(Coords{2, 3});
-
-        CHECK(cell1.x == 1);
-        CHECK(cell1.y == 2);
-        CHECK(cell1.col() == 1);
-        CHECK(cell1.row() == 2);
-        CHECK(cell1 == Coords{1, 2});
-
-        CHECK(cell2.x == 2);
-        CHECK(cell2.y == 3);
-        CHECK(cell2.col() == 2);
-        CHECK(cell2.row() == 3);
-        CHECK(cell2 == Coords{2, 3});
-    }
-
     SECTION("can access and change values")
     {
         SECTION("const")

@@ -78,6 +78,14 @@ TEST_CASE("Coords")
         CHECK((Coords{3, 2} >= Coords{3, 3}) == false);
     }
 
+    SECTION("col() and row() return x and y coordinates")
+    {
+        CHECK(Coords{}.col() == 0);
+        CHECK(Coords{}.row() == 0);
+        CHECK(Coords{2, 3}.col() == 2);
+        CHECK(Coords{2, 3}.row() == 3);
+    }
+
     SECTION("move()")
     {
         Coords a{1, 2};
