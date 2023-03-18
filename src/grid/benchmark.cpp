@@ -5,9 +5,9 @@
 
 #include "grid.hpp"
 
-Grid<int> create_grid_with_numbered_values(const int rows, const int cols)
+Grid<int, Coords<short>> create_grid_with_numbered_values(const int rows, const int cols)
 {
-    Grid<int> grid{rows, cols};
+    Grid<int, Coords<short>> grid{rows, cols};
 
     for (int row = 0; row < rows; ++row)
         for (int col = 0; col < cols; ++col)
@@ -20,7 +20,7 @@ void benchmark_create_grid()
 {
     for (auto size : {4, 16, 256, 1024}) {
         ankerl::nanobench::Bench().run(fmt::format("create grid: {}x{}", size, size), [&] {
-            const Grid<int> grid = create_grid_with_numbered_values(size, size);
+            const auto grid = create_grid_with_numbered_values(size, size);
             ankerl::nanobench::doNotOptimizeAway(grid);
         });
     }
@@ -49,7 +49,7 @@ void benchmark_sum_baseline()
 void benchmark_sum_vector()
 {
     for (auto size : {4, 16, 256, 1024}) {
-        const Grid<int> grid = create_grid_with_numbered_values(size, size);
+        const auto grid = create_grid_with_numbered_values(size, size);
 
         ankerl::nanobench::Bench().run(fmt::format("sum vector: {}x{}", size, size), [&] {
             int sum = 0;
@@ -65,7 +65,7 @@ void benchmark_sum_vector()
 void benchmark_sum_rows()
 {
     for (auto size : {4, 16, 256, 1024}) {
-        const Grid<int> grid = create_grid_with_numbered_values(size, size);
+        const auto grid = create_grid_with_numbered_values(size, size);
 
         ankerl::nanobench::Bench().run(fmt::format("sum rows: {}x{}", size, size), [&] {
             int sum = 0;
@@ -82,7 +82,7 @@ void benchmark_sum_rows()
 void benchmark_sum_cols()
 {
     for (auto size : {4, 16, 256, 1024}) {
-        const Grid<int> grid = create_grid_with_numbered_values(size, size);
+        const auto grid = create_grid_with_numbered_values(size, size);
 
         ankerl::nanobench::Bench().run(fmt::format("sum columns: {}x{}", size, size), [&] {
             int sum = 0;
@@ -99,7 +99,7 @@ void benchmark_sum_cols()
 void benchmark_sum_cell_rows()
 {
     for (auto size : {4, 16, 256, 1024}) {
-        const Grid<int> grid = create_grid_with_numbered_values(size, size);
+        const auto grid = create_grid_with_numbered_values(size, size);
 
         ankerl::nanobench::Bench().run(fmt::format("sum cell rows: {}x{}", size, size), [&] {
             int sum = 0;
@@ -121,7 +121,7 @@ void benchmark_sum_cell_rows()
 void benchmark_sum_cell_cols()
 {
     for (auto size : {4, 16, 256, 1024}) {
-        const Grid<int> grid = create_grid_with_numbered_values(size, size);
+        const auto grid = create_grid_with_numbered_values(size, size);
 
         ankerl::nanobench::Bench().run(fmt::format("sum cell cols: {}x{}", size, size), [&] {
             int sum = 0;

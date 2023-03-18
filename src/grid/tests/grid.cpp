@@ -722,6 +722,36 @@ TEST_CASE("Grid")
         CHECK(std::all_of(grid.begin(), grid.end(), [](int i) { return i == -1; }));
     }
 
+    SECTION("can create Grid with different Coords types")
+    {
+        const Grid<int, Coords<int8_t>> grid_with_i8_bit_coords{4, 4, 42};
+        const Grid<int, Coords<int16_t>> grid_with_i16_bit_coords{4, 4, 42};
+        const Grid<int, Coords<int32_t>> grid_with_i32_bit_coords{4, 4, 42};
+        // const Grid<int, Coords<int64_t>> grid_with_i64_bit_coords{4, 4, 42};  // not supported
+        const Grid<int, Coords<uint8_t>> grid_with_u8_bit_coords{4, 4, 42};
+        const Grid<int, Coords<uint16_t>> grid_with_u16_bit_coords{4, 4, 42};
+        // const Grid<int, Coords<uint32_t>> grid_with_u32_bit_coords{4, 4, 42};  // not supported
+        // const Grid<int, Coords<uint64_t>> grid_with_u64_bit_coords{4, 4, 42};  // not supported
+
+        CHECK(grid_with_i8_bit_coords.at({2, 2}) == 42);
+        CHECK(grid_with_i16_bit_coords.at({2, 2}) == 42);
+        CHECK(grid_with_i32_bit_coords.at({2, 2}) == 42);
+        // CHECK(grid_with_i64_bit_coords.at({2, 2}) == 42);
+        CHECK(grid_with_u8_bit_coords.at({2, 2}) == 42);
+        CHECK(grid_with_u16_bit_coords.at({2, 2}) == 42);
+        // CHECK(grid_with_u32_bit_coords.at({2, 2}) == 42);
+        // CHECK(grid_with_u64_bit_coords.at({2, 2}) == 42);
+    }
+
+    SECTION("can create maximum sized Grid")
+    {
+        const Grid<char, Coords<int8_t>> grid_with_7_bit_coords{128, 128, 42};
+        const Grid<char, Coords<uint8_t>> grid_with_8_bit_coords{256, 256, 42};
+
+        CHECK(grid_with_7_bit_coords.at({127, 127}) == 42);
+        CHECK(grid_with_8_bit_coords.at({255, 255}) == 42);
+    }
+
     SECTION("width() and height() return the correct values")
     {
         const Grid<int> grid{4, 3};

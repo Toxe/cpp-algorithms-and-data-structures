@@ -7,11 +7,11 @@
 
 #include "gridcell.hpp"
 
-template <typename T>
+template <typename T = int, typename CoordsType = Coords<int>>
 class Grid {
 public:
     using difference_type = std::ptrdiff_t;
-    using size_type = std::ptrdiff_t;
+    using size_type = int;
 
     constexpr static difference_type direction_forward = 1;
     constexpr static difference_type direction_reverse = -1;
@@ -164,7 +164,7 @@ private:
         difference_type value_iter_stride_;
     };
 
-    template <typename grid_value_type_pointer, typename grid_value_type_reference, std::ptrdiff_t direction>
+    template <typename grid_value_type_pointer, typename grid_value_type_reference, typename Grid::difference_type direction>
     class RowOrColIterator {
     public:
         using row_or_col_type = RowOrCol<grid_value_type_pointer, grid_value_type_reference>;
@@ -323,15 +323,16 @@ public:
     using reference = T&;
     using const_pointer = const T*;
     using const_reference = const T&;
+    using coords_type = CoordsType;
     using grid_rows_type = GridRowsOrCols<pointer, reference>;
     using grid_cols_type = GridRowsOrCols<pointer, reference>;
     using const_grid_rows_type = GridRowsOrCols<const_pointer, const_reference>;
     using const_grid_cols_type = GridRowsOrCols<const_pointer, const_reference>;
-    using grid_cell_type = GridCell<Grid<T>*>;
-    using const_grid_cell_type = GridCell<const Grid<T>*>;
+    using grid_cell_type = GridCell<Grid<T, coords_type>*, coords_type>;
+    using const_grid_cell_type = GridCell<const Grid<T, coords_type>*, coords_type>;
 
     Grid(size_type cols, size_type rows);
-    Grid(size_type cols, size_type rows, const T& at);
+    Grid(size_type cols, size_type rows, const T& value);
 
     size_type width() const { return cols_; }
     size_type height() const { return rows_; }
@@ -341,17 +342,17 @@ public:
     pointer data() { return data_.data(); }
     const_pointer data() const { return data_.data(); }
 
-    [[nodiscard]] inline reference at(size_type col, size_type row);
-    [[nodiscard]] inline const_reference at(size_type col, size_type row) const;
+    [[nodiscard]] reference at(size_type col, size_type row) { return data_[idx(col, row)]; }
+    [[nodiscard]] const_reference at(size_type col, size_type row) const { return data_[idx(col, row)]; }
 
-    [[nodiscard]] reference at(const Coords& coords) { return at(coords.x, coords.y); }
-    [[nodiscard]] const_reference at(const Coords& coords) const { return at(coords.x, coords.y); }
+    [[nodiscard]] reference at(const coords_type& coords) { return data_[idx(coords)]; }
+    [[nodiscard]] const_reference at(const coords_type& coords) const { return data_[idx(coords)]; }
 
-    [[nodiscard]] grid_cell_type cell(const Coords& coords) { return grid_cell_type{this, coords}; }
-    [[nodiscard]] grid_cell_type cell(size_type col, size_type row) { return cell(Coords{static_cast<int>(col), static_cast<int>(row)}); }
+    [[nodiscard]] grid_cell_type cell(const coords_type& coords) { return grid_cell_type{this, coords}; }
+    [[nodiscard]] const_grid_cell_type cell(const coords_type& coords) const { return const_grid_cell_type{this, coords}; }
 
-    [[nodiscard]] const_grid_cell_type cell(const Coords& coords) const { return const_grid_cell_type{this, coords}; }
-    [[nodiscard]] const_grid_cell_type cell(size_type col, size_type row) const { return cell(Coords{static_cast<int>(col), static_cast<int>(row)}); }
+    [[nodiscard]] grid_cell_type cell(size_type col, size_type row) { return cell(coords_type{static_cast<typename coords_type::coordinates_type>(col), static_cast<typename coords_type::coordinates_type>(row)}); }
+    [[nodiscard]] const_grid_cell_type cell(size_type col, size_type row) const { return cell(coords_type{static_cast<typename coords_type::coordinates_type>(col), static_cast<typename coords_type::coordinates_type>(row)}); }
 
     auto begin() { return data_.begin(); }
     auto begin() const { return data_.cbegin(); }
@@ -388,46 +389,44 @@ private:
 
     std::vector<T> data_;
 
-    [[nodiscard]] inline size_type idx(size_type col, size_type row) const;
-    [[nodiscard]] size_type idx(const Coords& coords) const { return idx(coords.x, coords.y); }
+    [[nodiscard]] inline std::size_t idx(size_type col, size_type row) const;
+    [[nodiscard]] inline std::size_t idx(const coords_type& coords) const;
 };
 
-template <typename T>
-Grid<T>::Grid(const size_type cols, const size_type rows)
+template <typename T, typename CoordsType>
+Grid<T, CoordsType>::Grid(const size_type cols, const size_type rows)
 {
     assert(cols > 0 && rows > 0);
+    assert(cols - 1 <= coords_type::max());
+    assert(rows - 1 <= coords_type::max());
     cols_ = cols;
     rows_ = rows;
     data_ = std::vector<T>(static_cast<std::size_t>(cols * rows));
 }
 
-template <typename T>
-Grid<T>::Grid(const size_type cols, const size_type rows, const T& at)
+template <typename T, typename CoordsType>
+Grid<T, CoordsType>::Grid(const size_type cols, const size_type rows, const T& value)
 {
     assert(cols > 0 && rows > 0);
+    assert(cols - 1 <= coords_type::max());
+    assert(rows - 1 <= coords_type::max());
     cols_ = cols;
     rows_ = rows;
-    data_ = std::vector<T>(static_cast<std::size_t>(cols * rows), at);
+    data_ = std::vector<T>(static_cast<std::size_t>(cols * rows), value);
 }
 
-template <typename T>
-typename Grid<T>::reference Grid<T>::at(const size_type col, const size_type row)
-{
-    assert(idx(col, row) < size());
-    return data_[static_cast<std::size_t>(idx(col, row))];
-}
-
-template <typename T>
-typename Grid<T>::const_reference Grid<T>::at(const size_type col, const size_type row) const
-{
-    assert(idx(col, row) < size());
-    return data_[static_cast<std::size_t>(idx(col, row))];
-}
-
-template <typename T>
-typename Grid<T>::size_type Grid<T>::idx(const size_type col, const size_type row) const
+template <typename T, typename CoordsType>
+std::size_t Grid<T, CoordsType>::idx(const size_type col, const size_type row) const
 {
     assert(col >= 0 && col < cols_);
     assert(row >= 0 && row < rows_);
-    return row * cols_ + col;
+    return static_cast<std::size_t>(row * cols_ + col);
+}
+
+template <typename T, typename CoordsType>
+std::size_t Grid<T, CoordsType>::idx(const coords_type& coords) const
+{
+    assert(coords.x >= 0 && coords.x < cols_);
+    assert(coords.y >= 0 && coords.y < rows_);
+    return static_cast<std::size_t>(coords.y * cols_ + coords.x);
 }
